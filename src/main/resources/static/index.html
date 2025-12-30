@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pastebin Lite</title>
+</head>
+<body>
+
+<h2>Create Paste</h2>
+
+<textarea id="content" rows="8" cols="60" placeholder="Enter paste content"></textarea><br><br>
+
+TTL (seconds):
+<input type="number" id="ttl"><br><br>
+
+Max Views:
+<input type="number" id="maxViews"><br><br>
+
+<button onclick="createPaste()">Create Paste</button>
+
+<p id="error" style="color:red;"></p>
+<p id="result"></p>
+
+<script>
+    function createPaste() {
+        document.getElementById("error").innerText = "";
+        document.getElementById("result").innerText = "";
+
+        const content = document.getElementById("content").value;
+        const ttl = document.getElementById("ttl").value;
+        const maxViews = document.getElementById("maxViews").value;
+
+        fetch("/api/pastes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                content: content,
+                ttl_seconds: ttl ? Number(ttl) : null,
+                max_views: maxViews ? Number(maxViews) : null
+            })
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Something went wrong");
+            }
+            return data;
+        })
+        .then(data => {
+            document.getElementById("result").innerHTML =
+                `Paste created: <a href="${data.url}" target="_blank">${data.url}</a>`;
+        })
+        .catch(err => {
+            document.getElementById("error").innerText = err.message;
+        });
+    }
+</script>
+
+</body>
+</html>
