@@ -9,6 +9,9 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Give execute permission to mvnw
+RUN chmod +x mvnw
+
 # Download dependencies
 RUN ./mvnw dependency:go-offline
 
@@ -18,7 +21,7 @@ COPY src src
 # Build application
 RUN ./mvnw clean package -DskipTests
 
-# Expose port (Render provides PORT)
+# Expose port
 EXPOSE 8080
 
 # Run the application
